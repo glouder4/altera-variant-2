@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # Apache + PHP 8.2
+  apache:
+    image: php:8.2-apache  # Или 8.1, 8.0
+    ports:
+      - "80:80"
+    volumes:
+      - ./www:/var/www/html  # Папка с сайтом
+    environment:
+      PHP_MEMORY_LIMIT: "512M"
+      UPLOAD_MAX_FILESIZE: "64M"
+      POST_MAX_SIZE: "64M"
+    # Дополнительные модули PHP (pdo_mysql, gd, zip и т.д.)
+    command: >
+      bash -c "apt-get update && apt-get install -y libzip-dev libpng-dev libjpeg-dev libfreetype6-dev
+      && docker-php-ext-configure gd --with-freetype --with-jpeg
+      && docker-php-ext-install pdo_mysql mysqli gd zip bcmath opcache
+      && a2enmod rewrite
+      && apache2-foreground"
+
+  # MySQL 8
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"  # Пароль рута
+      MYSQL_DATABASE: "bitrix"     # Автосоздание БД
+      MYSQL_USER: "bitrix"       # Юзер БД
+      MYSQL_PASSWORD: "bitrix"   # Пароль юзера
+    volumes:
+      - mysql-data:/var/lib/mysql  # Сохранение данных БД
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql
+    depends_on:
+      - mysql
+
+volumes:
+  mysql-data:
