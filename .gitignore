@@ -11,7 +11,7 @@ Thumbs.db
 .DS_Store
 ._.DS_Store
 /www/robots.txt
- 
+
 /www/bitrix/.settings.php
 /www/bitrix/activities/
 /www/bitrix/admin/
@@ -51,9 +51,9 @@ Thumbs.db
 /www/bitrix/services/
 /www/bitrix/php_interface/include/sale_payment/
 /www/bitrix/php_interface/include/sale_delivery/
- 
+
 /www/bitrix/php_interface/dbconn.php
- 
+
 /www/bitrix/cache/
 /www/bitrix/managed_cache/
 /www/bitrix/stack_cache/
@@ -113,3 +113,12 @@ www/20250520_121931_3502870862607060.enc.gz.9
 /www/bitrix/fonts
 /www/bitrix/legal
 /www/bitrix/templates
+bitrix/.settings.php
+bitrix/php_interface/dbconn.php
+upload/1.xml
+upload/3.xml
+upload/4.xml
+www/bitrix.rar
+upload/1.xml
+upload/3.xml
+upload/4.xml

@@ -5,7 +5,21 @@ require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_before.ph
 
 header('Content-Type: application/json; charset=UTF-8');
 
+if (!CModule::IncludeModule("iblock") || !CModule::IncludeModule("main")) {
+    echo json_encode(['success' => false, 'error' => 'Не удалось подключить модули']);
+    exit;
+}
+
 if (check_bitrix_sessid() && !empty($_REQUEST["submit"])) {
+    function getElementNameById($id, $iblockId) {
+        if (!$id) return '';
+        $res = CIBlockElement::GetList([], ['IBLOCK_ID' => $iblockId, 'ID' => $id], false, false, ['ID', 'NAME']);
+        if ($ar = $res->Fetch()) {
+            return $ar['NAME'];
+        }
+        return '';
+    }
+
     // Получаем поля
     $fields = [
         'clinic'     => trim($_REQUEST['clinic']),
@@ -32,10 +46,6 @@ if (check_bitrix_sessid() && !empty($_REQUEST["submit"])) {
     }
 
     global $USER;
-    if (!CModule::IncludeModule("iblock") || !CModule::IncludeModule("main")) {
-        echo json_encode(['success' => false, 'error' => 'Не удалось подключить модули']);
-        exit;
-    }
 
 // 1. Поиск/создание пользователя
     $user = false;
@@ -43,12 +53,15 @@ if (check_bitrix_sessid() && !empty($_REQUEST["submit"])) {
     if ($arUser = $rsUser->Fetch()) {
         $userId = $arUser['ID'];
     } else {
-        $password = Main\Security\Random(8);
+        $characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        $randomString = str_shuffle($characters);
+        $password = substr($randomString, 0, 10);
         $user = new CUser;
         $arFields = [
             "NAME" => $fields['fio'],
             "EMAIL" => $fields['email'],
             "LOGIN" => $fields['email'],
+            "PHONE_NUMBER" => $fields['phone'],
             "LID" => SITE_ID,
             "ACTIVE" => "Y",
             "GROUP_ID" => [5],
